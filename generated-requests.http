@@ -1,0 +1,187 @@
+### Variables
+@baseUrl = http://localhost:8080
+@contentType = application/json
+
+@kamilLogin = kamil
+@kamilPassword = kamil123
+@adminLogin = lukasz
+@adminPassword = lukasz123
+@user1Login = user1
+@user1Password = user1password
+
+@kamilId = f4b5b79b-df2c-4e0a-89fc-464908d2e6dc
+@lukaszId = fc6e600b-e89e-42e2-b2b7-ca18edb68924
+
+@testVehicleId = test_vehicle_123
+
+# Replace with an actual Rental ID that needs payment.
+@exampleRentalIdForPayment = d26a7fbf-d694-4ce2-b1a6-0d009e0bdbf7
+
+
+# ----------------------------------------------------------
+# AUTHENTICATION & BASIC USER MANAGEMENT
+# ----------------------------------------------------------
+
+### Login as Admin
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{contentType}}
+
+{
+  "login": "{{adminLogin}}",
+  "password": "{{adminPassword}}"
+}
+
+> {%
+    client.global.set("auth_token", response.body.token);
+    client.log("Admin Token: " + response.body.token);
+%}
+
+### Login as regular User
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{contentType}}
+
+{
+  "login": "{{kamilLogin}}",
+  "password": "{{kamilPassword}}"
+}
+
+> {%
+    client.global.set("user_auth_token", response.body.token);
+    client.log("User Token: " + response.body.token);
+%}
+
+
+### Register a New User
+POST {{baseUrl}}/api/auth/register
+Content-Type: {{contentType}}
+
+{
+  "login": "newUserTest",
+  "password": "newPassword123"
+}
+
+### Get All Users (ADMIN only)
+GET {{baseUrl}}/api/users
+Content-Type: {{contentType}}
+Authorization: Bearer {{auth_token}}
+
+### Add Role to a User (ADMIN only)
+POST {{baseUrl}}/api/users/{{kamilId}}/roles/add?roleName=ROLE_ADMIN
+Content-Type: {{contentType}}
+Authorization: Bearer {{auth_token}}
+
+### Remove Role from a User (ADMIN only)
+POST {{baseUrl}}/api/users/{{kamilId}}/roles/remove?roleName=ROLE_ADMIN
+Content-Type: {{contentType}}
+Authorization: Bearer {{auth_token}}
+
+### Get User Roles for Authenticated User (USER, ADMIN)
+GET {{baseUrl}}/api/users/test-role
+Content-Type: {{contentType}}
+Authorization: Bearer {{auth_token}}
+
+# ----------------------------------------------------------
+# ADMIN VEHICLE MANAGEMENT
+# ----------------------------------------------------------
+
+### Get All Vehicles (ADMIN only)
+GET {{baseUrl}}/api/vehicles
+Content-Type: {{contentType}}
+Authorization: Bearer {{auth_token}}
+
+### Get Vehicle by ID (ADMIN only)
+GET {{baseUrl}}/api/vehicles/{{testVehicleId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{auth_token}}
+
+### Add a New Vehicle (ADMIN only)
+POST {{baseUrl}}/api/vehicles
+Content-Type: {{contentType}}
+Authorization: Bearer {{auth_token}}
+
+{
+  "id": "{{testVehicleId}}",
+  "price": 300,
+  "category": "Car",
+  "brand": "TestBrand",
+  "model": "TestModel",
+  "year": 2025,
+  "plate": "TVA123",
+  "isActive": true
+}
+
+### Remove Vehicle (ADMIN only)
+DELETE {{baseUrl}}/api/vehicles/{{testVehicleId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{auth_token}}
+
+# ----------------------------------------------------------
+# RENTAL OPERATIONS (USER & ADMIN)
+# ----------------------------------------------------------
+
+### Get Available Vehicles (USER, ADMIN)
+GET {{baseUrl}}/api/vehicles/available
+Content-Type: {{contentType}}
+Authorization: Bearer {{auth_token}}
+
+### Rent a Vehicle (USER, ADMIN)
+POST {{baseUrl}}/api/rentals/rent
+Content-Type: {{contentType}}
+Authorization: Bearer {{user_auth_token}}
+
+{
+  "vehicleId": "1"
+}
+
+> {%
+    client.global.set("new_rental_id", response.body.id);
+%}
+
+### Get My Active Rentals (USER, ADMIN)
+GET {{baseUrl}}/api/rentals/rented
+Content-Type: {{contentType}}
+Authorization: Bearer {{user_auth_token}}
+
+### Return a Vehicle (USER, ADMIN)
+POST {{baseUrl}}/api/rentals/return
+Content-Type: {{contentType}}
+Authorization: Bearer {{user_auth_token}}
+
+{
+  "vehicleId": "1"
+}
+
+### Get All Rentals (ADMIN only)
+GET {{baseUrl}}/api/rentals
+Content-Type: {{contentType}}
+Authorization: Bearer {{auth_token}}
+
+### Get All Active Rentals (ADMIN only)
+GET {{baseUrl}}/api/rentals/active
+Content-Type: {{contentType}}
+Authorization: Bearer {{auth_token}}
+
+### Get Rented Vehicles (USER, ADMIN)
+GET {{baseUrl}}/api/vehicles/rented
+Content-Type: {{contentType}}
+Authorization: Bearer {{user_auth_token}}
+
+
+# ----------------------------------------------------------
+# PAYMENT OPERATIONS (USER)
+# ----------------------------------------------------------
+
+### Get Payment Link for a Rental (USER, ADMIN)
+POST {{baseUrl}}/api/payments/checkout/{{new_rental_id}}
+Content-Type: application/x-www-form-urlencoded
+Authorization: Bearer {{user_auth_token}}
+
+### Payment Success Callback
+GET {{baseUrl}}/api/payments/success
+Content-Type: {{contentType}}
+Authorization: Bearer {{user_auth_token}}
+
+### Payment Cancel Callback
+GET {{baseUrl}}/api/payments/cancel
+Content-Type: {{contentType}}
+Authorization: Bearer {{user_auth_token}}
