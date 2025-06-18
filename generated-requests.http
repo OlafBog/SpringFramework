@@ -2,24 +2,22 @@
 @baseUrl = http://localhost:8080
 @contentType = application/json
 
-@kamilLogin = kamil
-@kamilPassword = kamil123
-@adminLogin = lukasz
-@adminPassword = lukasz123
 @user1Login = user1
-@user1Password = user1password
+@user1Password = user123
+@admin1Login = admin1
+@admin1Password = admin123
 
-@kamilId = f4b5b79b-df2c-4e0a-89fc-464908d2e6dc
-@lukaszId = fc6e600b-e89e-42e2-b2b7-ca18edb68924
+@user1Id = 918e60fc-b65d-470e-a7c0-280719dcccd0
+@admin1Id = bd296454-5412-49f7-aa72-6fcdf46a41b1
 
-@testVehicleId = test_vehicle_123
+@testVehicleId = test_vehicle_123_ID
 
 # Replace with an actual Rental ID that needs payment.
 @exampleRentalIdForPayment = d26a7fbf-d694-4ce2-b1a6-0d009e0bdbf7
 
 
 # ----------------------------------------------------------
-# AUTHENTICATION & BASIC USER MANAGEMENT
+# AUTHENTICATION
 # ----------------------------------------------------------
 
 ### Login as Admin
@@ -27,8 +25,8 @@ POST {{baseUrl}}/api/auth/login
 Content-Type: {{contentType}}
 
 {
-  "login": "{{adminLogin}}",
-  "password": "{{adminPassword}}"
+  "login": "{{admin1Login}}",
+  "password": "{{admin1Password}}"
 }
 
 > {%
@@ -41,8 +39,8 @@ POST {{baseUrl}}/api/auth/login
 Content-Type: {{contentType}}
 
 {
-  "login": "{{kamilLogin}}",
-  "password": "{{kamilPassword}}"
+  "login": "{{user1Login}}",
+  "password": "{{user1Password}}"
 }
 
 > {%
@@ -50,28 +48,31 @@ Content-Type: {{contentType}}
     client.log("User Token: " + response.body.token);
 %}
 
-
 ### Register a New User
 POST {{baseUrl}}/api/auth/register
 Content-Type: {{contentType}}
 
 {
-  "login": "newUserTest",
-  "password": "newPassword123"
+  "login": "randomLogin",
+  "password": "123"
 }
+###
+# ----------------------------------------------------------
+# USER MANAGEMENT
+# ----------------------------------------------------------
 
-### Get All Users (ADMIN only)
+### Get All Rentals (ADMIN only)
 GET {{baseUrl}}/api/users
 Content-Type: {{contentType}}
 Authorization: Bearer {{auth_token}}
 
 ### Add Role to a User (ADMIN only)
-POST {{baseUrl}}/api/users/{{kamilId}}/roles/add?roleName=ROLE_ADMIN
+POST {{baseUrl}}/api/users/{{user1Id}}/roles/add?roleName=ROLE_ADMIN
 Content-Type: {{contentType}}
 Authorization: Bearer {{auth_token}}
 
 ### Remove Role from a User (ADMIN only)
-POST {{baseUrl}}/api/users/{{kamilId}}/roles/remove?roleName=ROLE_ADMIN
+POST {{baseUrl}}/api/users/{{user1Id}}/roles/remove?roleName=ROLE_ADMIN
 Content-Type: {{contentType}}
 Authorization: Bearer {{auth_token}}
 
@@ -102,11 +103,11 @@ Authorization: Bearer {{auth_token}}
 {
   "id": "{{testVehicleId}}",
   "price": 300,
-  "category": "Car",
-  "brand": "TestBrand",
-  "model": "TestModel",
+  "category": "Motorcycle",
+  "brand": "brand3",
+  "model": "model3",
   "year": 2025,
-  "plate": "TVA123",
+  "plate": "plate3",
   "isActive": true
 }
 
