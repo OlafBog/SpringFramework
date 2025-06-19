@@ -31,7 +31,6 @@ Content-Type: {{contentType}}
 
 > {%
     client.global.set("auth_token", response.body.token);
-    client.log("Admin Token: " + response.body.token);
 %}
 
 ### Login as regular User
@@ -44,8 +43,7 @@ Content-Type: {{contentType}}
 }
 
 > {%
-    client.global.set("user_auth_token", response.body.token);
-    client.log("User Token: " + response.body.token);
+    client.global.set("auth_token", response.body.token);
 %}
 
 ### Register a New User
@@ -128,7 +126,7 @@ Authorization: Bearer {{auth_token}}
 ### Rent a Vehicle (USER, ADMIN)
 POST {{baseUrl}}/api/rentals/rent
 Content-Type: {{contentType}}
-Authorization: Bearer {{user_auth_token}}
+Authorization: Bearer {{auth_token}}
 
 {
   "vehicleId": "1"
@@ -141,12 +139,12 @@ Authorization: Bearer {{user_auth_token}}
 ### Get My Active Rentals (USER, ADMIN)
 GET {{baseUrl}}/api/rentals/rented
 Content-Type: {{contentType}}
-Authorization: Bearer {{user_auth_token}}
+Authorization: Bearer {{auth_token}}
 
 ### Return a Vehicle (USER, ADMIN)
 POST {{baseUrl}}/api/rentals/return
 Content-Type: {{contentType}}
-Authorization: Bearer {{user_auth_token}}
+Authorization: Bearer {{auth_token}}
 
 {
   "vehicleId": "1"
@@ -165,7 +163,7 @@ Authorization: Bearer {{auth_token}}
 ### Get Rented Vehicles (USER, ADMIN)
 GET {{baseUrl}}/api/vehicles/rented
 Content-Type: {{contentType}}
-Authorization: Bearer {{user_auth_token}}
+Authorization: Bearer {{auth_token}}
 
 
 # ----------------------------------------------------------
@@ -175,14 +173,14 @@ Authorization: Bearer {{user_auth_token}}
 ### Get Payment Link for a Rental (USER, ADMIN)
 POST {{baseUrl}}/api/payments/checkout/{{new_rental_id}}
 Content-Type: application/x-www-form-urlencoded
-Authorization: Bearer {{user_auth_token}}
+Authorization: Bearer {{auth_token}}
 
 ### Payment Success Callback
 GET {{baseUrl}}/api/payments/success
 Content-Type: {{contentType}}
-Authorization: Bearer {{user_auth_token}}
+Authorization: Bearer {{auth_token}}
 
 ### Payment Cancel Callback
 GET {{baseUrl}}/api/payments/cancel
 Content-Type: {{contentType}}
-Authorization: Bearer {{user_auth_token}}
+Authorization: Bearer {{auth_token}}
